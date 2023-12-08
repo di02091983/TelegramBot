@@ -9,6 +9,7 @@ namespace TelegramBot
     internal class Program
     {
         static ITelegramBotClient bot;
+        static YaGPT yandexGPT;
 
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
@@ -22,7 +23,12 @@ namespace TelegramBot
                     await botClient.SendTextMessageAsync(message.Chat, "Добро пожаловать на борт, добрый путник!");
                     return;
                 }
-                await botClient.SendTextMessageAsync(message.Chat, "Привет-привет!!");
+                else
+                {
+                    var response = await yandexGPT.SendRequest(message.Text.ToLower());
+
+                    await botClient.SendTextMessageAsync(message.Chat, response);
+                }
             }
         }
 
@@ -37,7 +43,10 @@ namespace TelegramBot
             IConfiguration Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .Build();
-            
+
+
+            yandexGPT = new YaGPT(Configuration);
+
             var token = Configuration.GetValue<string>("BotToken");
 
             bot = new TelegramBotClient(token);
@@ -49,6 +58,7 @@ namespace TelegramBot
             {
                 AllowedUpdates = { }, // receive all update types
             };
+
             bot.StartReceiving(
                 HandleUpdateAsync,
                 HandleErrorAsync,

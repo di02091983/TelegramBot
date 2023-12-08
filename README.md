@@ -1,2 +1,2 @@
 # TelegramBot
-Test bot for Telegram on C#
+Телеграм бот для работы с нейросетью Яндекса YandexGPT.
