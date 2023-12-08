@@ -40,32 +40,39 @@ namespace TelegramBot
 
         static void Main(string[] args)
         {
-            IConfiguration Configuration = new ConfigurationBuilder()
+            try
+            {
+                IConfiguration Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .Build();
 
+                yandexGPT = new YaGPT(Configuration);
 
-            yandexGPT = new YaGPT(Configuration);
+                var token = Configuration.GetValue<string>("BotToken");
 
-            var token = Configuration.GetValue<string>("BotToken");
+                bot = new TelegramBotClient(token);
+                Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
 
-            bot = new TelegramBotClient(token);
-            Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
+                var cts = new CancellationTokenSource();
+                var cancellationToken = cts.Token;
+                var receiverOptions = new ReceiverOptions
+                {
+                    AllowedUpdates = { }, // receive all update types
+                };
+            
+                bot.StartReceiving(
+                    HandleUpdateAsync,
+                    HandleErrorAsync,
+                    receiverOptions,
+                    cancellationToken
+                );
 
-            var cts = new CancellationTokenSource();
-            var cancellationToken = cts.Token;
-            var receiverOptions = new ReceiverOptions
+                Console.ReadLine();
+            }
+            catch ( Exception ex )
             {
-                AllowedUpdates = { }, // receive all update types
-            };
-
-            bot.StartReceiving(
-                HandleUpdateAsync,
-                HandleErrorAsync,
-                receiverOptions,
-                cancellationToken
-            );
-            Console.ReadLine();
+                Console.WriteLine( ex );
+            }
         }
     }
 }
