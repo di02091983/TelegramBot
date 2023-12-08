@@ -38,7 +38,7 @@ namespace TelegramBot
             Console.WriteLine(JsonSerializer.Serialize(exception));
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace TelegramBot
                 {
                     AllowedUpdates = { }, // receive all update types
                 };
-            
+                
                 bot.StartReceiving(
                     HandleUpdateAsync,
                     HandleErrorAsync,
@@ -67,7 +67,8 @@ namespace TelegramBot
                     cancellationToken
                 );
 
-                Console.ReadLine();
+                //Console.ReadLine();
+                await Task.Delay(Timeout.Infinite);
             }
             catch ( Exception ex )
             {
