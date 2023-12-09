@@ -15,7 +15,6 @@ namespace TelegramBot
 {
     internal class YaGPT
     {
-        HttpClient client = new HttpClient();
         IConfiguration configuration;
 
         private string iamToken;
@@ -36,6 +35,7 @@ namespace TelegramBot
         {
             try
             {
+                HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {iamToken}");
                 client.DefaultRequestHeaders.Add("x-folder-id", yandexFolderId);
 
@@ -61,7 +61,9 @@ namespace TelegramBot
         public async Task UpdateIAMToken()
         {
             try 
-            { 
+            {
+                HttpClient client = new HttpClient();
+
                 var apiTokenUrl = "https://iam.api.cloud.yandex.net/iam/v1/tokens";
             
                 YaIAMTokenRequest tokenRequest = new YaIAMTokenRequest();
