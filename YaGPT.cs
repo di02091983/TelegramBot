@@ -34,46 +34,68 @@ namespace TelegramBot
 
         public async Task<string> SendRequest(string message)
         {
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {iamToken}");
-            client.DefaultRequestHeaders.Add("x-folder-id", yandexFolderId);
+            try
+            {
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {iamToken}");
+                client.DefaultRequestHeaders.Add("x-folder-id", yandexFolderId);
 
-            var promt =  new YaPromt();
-            promt.ModelUri = $"gpt://{yandexFolderId}/yandexgpt-lite";
-            promt.Messages.Add(new Promt.YaMessage(message));
+                var promt = new YaPromt();
+                promt.ModelUri = $"gpt://{yandexFolderId}/yandexgpt-lite";
+                promt.Messages.Add(new Promt.YaMessage(message));
 
-            JsonContent content = JsonContent.Create(promt);
+                JsonContent content = JsonContent.Create(promt);
 
-            var responseMessage = await client.PostAsync(apiUrl, content);
+                var responseMessage = await client.PostAsync(apiUrl, content);
 
-            var response = await responseMessage.Content.ReadFromJsonAsync<YaResponse>();
+                var response = await responseMessage.Content.ReadFromJsonAsync<YaResponse>();
 
-            return response.Result.Alternatives.FirstOrDefault().Message.Text;
+                return response.Result.Alternatives.FirstOrDefault().Message.Text;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return "";
+            }
         }
 
         public async Task UpdateIAMToken()
         {
-            var apiTokenUrl = "https://iam.api.cloud.yandex.net/iam/v1/tokens";
+            try 
+            { 
+                var apiTokenUrl = "https://iam.api.cloud.yandex.net/iam/v1/tokens";
             
-            YaIAMTokenRequest tokenRequest = new YaIAMTokenRequest();
-            tokenRequest.YandexPassportOauthToken = yandexOAuth;
+                YaIAMTokenRequest tokenRequest = new YaIAMTokenRequest();
+                tokenRequest.YandexPassportOauthToken = yandexOAuth;
 
-            JsonContent content = JsonContent.Create(tokenRequest);
-            var responseMessage = await client.PostAsync(apiTokenUrl, content);
+                JsonContent content = JsonContent.Create(tokenRequest);
+                var responseMessage = await client.PostAsync(apiTokenUrl, content);
 
-            var response = await responseMessage.Content.ReadFromJsonAsync<YaIAMTokenResponse>();
+                var response = await responseMessage.Content.ReadFromJsonAsync<YaIAMTokenResponse>();
 
-            iamToken = response.IAMToken;
+                iamToken = response.IAMToken;
 
-            UpdateAppSetting("IamToken", iamToken);
+                UpdateAppSetting("IamToken", iamToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public void UpdateAppSetting(string key, string value)
         {
-            var configJson = File.ReadAllText("appsettings.json");
-            var config = JsonSerializer.Deserialize<Dictionary<string, object>>(configJson);
-            config[key] = value;
-            var updatedConfigJson = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText("appsettings.json", updatedConfigJson);
+            try 
+            { 
+                var configJson = File.ReadAllText("appsettings.json");
+                var config = JsonSerializer.Deserialize<Dictionary<string, object>>(configJson);
+                config[key] = value;
+                var updatedConfigJson = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText("appsettings.json", updatedConfigJson);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }
