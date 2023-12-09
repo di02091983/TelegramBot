@@ -67,7 +67,7 @@ namespace TelegramBot
                     cancellationToken
                 );
 
-                Task.Run(() =>
+                await Task.Run(() =>
                 {
                     for(;;){
                         yandexGPT.UpdateIAMToken();
@@ -76,8 +76,6 @@ namespace TelegramBot
                     }
                 });
 
-                //Console.ReadLine();
-                await Task.Delay(Timeout.Infinite);
             }
             catch ( Exception ex )
             {
