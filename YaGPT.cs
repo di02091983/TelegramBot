@@ -86,11 +86,12 @@ namespace TelegramBot
         {
             try 
             { 
-                var configJson = File.ReadAllText("appsettings.json");
+                var pathAppSettings = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+                var configJson = File.ReadAllText(pathAppSettings);
                 var config = JsonSerializer.Deserialize<Dictionary<string, object>>(configJson);
                 config[key] = value;
                 var updatedConfigJson = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText("appsettings.json", updatedConfigJson);
+                File.WriteAllText(pathAppSettings, updatedConfigJson);
             }
             catch (Exception ex)
             {
