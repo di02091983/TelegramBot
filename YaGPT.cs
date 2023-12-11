@@ -47,14 +47,20 @@ namespace TelegramBot
 
                 var responseMessage = await client.PostAsync(apiUrl, content);
 
-                var response = await responseMessage.Content.ReadFromJsonAsync<YaResponse>();
-
-                return response.Result.Alternatives.FirstOrDefault().Message.Text;
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    var response = await responseMessage.Content.ReadFromJsonAsync<YaResponse>();
+                    return response.Result.Alternatives.FirstOrDefault().Message.Text;
+                }
+                else
+                {
+                    return "Ой, YandexGPT не хочет отвечать на этот вопрос!";
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return "";
+                return "Ой, что-то пошло не так!";
             }
         }
 
